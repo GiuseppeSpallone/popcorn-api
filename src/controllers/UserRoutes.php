@@ -19,6 +19,7 @@ class UserRoutes extends Route
         $app->post('/utente/registrazione', self::class . ':registrazione_utente');
         $app->post('/utente/accesso', self::class . ':accesso_utente');
         $app->get('/utente/token', self::class . ':get_dispositivi'); //per testare
+        $app->get('/notification', self::class . ':notification_all');
     }
 
     public function registrazione_utente(Request $request, Response $response)
@@ -78,6 +79,36 @@ class UserRoutes extends Route
         }
 
         return $response;
+    }
+
+    public function notification_all(Request $request, Response $response)
+    {
+        $message = array("message" => "ci sono riuscito cazzo");
+
+        $url = "https://fcm.googleapis.com/fcm/send";
+
+        $fields = array(
+            'registration_ids' => self::_get_dispositivi(),
+            'data' => $message
+        );
+
+        $headers = array(
+            'Authorization:key = 
+                    AAAARASmfMY:APA91bEVABajL8Ia8dfegCVCx_IHJYicXuYZuCyik0Hmr3-u1ym4-LmmBaKqKXX_zjeoWQaw9F8HHSlB3yoKlxpPh765Wh-VcArrGO6W62kmg61P_Tz3hSsDJujNjJ-UERBJq5jwV2QT',
+            'Content-Type: application/json'
+        );
+
+        $ch = curl_init();
+        curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
+        curl_setopt( $ch,CURLOPT_POST, true );
+        curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
+        curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
+        curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
+        curl_setopt( $ch,CURLOPT_POSTFIELDS, json_encode( $fields ) );
+        $result = curl_exec($ch );
+        curl_close( $ch );
+
+        return $result;
     }
 
     private function _utente_esistente($username, $email)
