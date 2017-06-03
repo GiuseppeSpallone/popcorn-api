@@ -31,6 +31,7 @@ class NotificationsRoutes extends Route
                 $firebase = new FirebaseController();
                 $result = $firebase->send($tokens, $message);
 
+                $result = true;
                 $this->message = "messaggio inviato";
                 $response = self::get_response($response, $result, 'notifica', true);
             } else {
