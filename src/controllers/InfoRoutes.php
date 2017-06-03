@@ -44,6 +44,9 @@ class InfoRoutes extends Route
                 $this->message = "non ci sono prezzi";
                 $response = self::get_response($response, $result, 'prezzi', false);
             }
+        } else {
+            $this->message = "database non connesso";
+            $response = self::get_response($response, $result, 'prezzi', false);
         }
 
         return $response;
@@ -80,6 +83,9 @@ class InfoRoutes extends Route
                 $this->message = "non ci sono sale";
                 $response = self::get_response($response, $result, 'sale', false);
             }
+        }else{
+            $this->message = "database non connesso";
+            $response = self::get_response($response, $result, 'sale', false);
         }
 
         return $response;
