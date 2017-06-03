@@ -2,7 +2,7 @@
 class DBController
 {
     const host = 'localhost';
-    const database = 'FCM';
+    const database = 'popapp';
     const username = 'root';
     const password = '';
 
