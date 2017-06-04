@@ -13,8 +13,8 @@ class NotificationsRoutes extends Route
 
     public static function register_routes(App $app)
     {
-        $app->post('/notification/all', self::class . ':notification_all');
-        $app->post('/notification/individual', self::class . ':notification_individual');
+        $app->post('/notifica/tutti', self::class . ':notification_all');
+        $app->post('/notifica/singolo', self::class . ':notification_individual');
     }
 
     public function notification_all(Request $request, Response $response)
@@ -74,7 +74,7 @@ class NotificationsRoutes extends Route
                 $data['data']['title'] = $title;
                 $data['data']['message'] = $message;
 
-                $utente = User::username_esistente($username);
+                $utente = User::get_utente_by_username($username);
                 if ($utente) {
                     $token = User::get_token_by_username($username);
                     if ($token) {

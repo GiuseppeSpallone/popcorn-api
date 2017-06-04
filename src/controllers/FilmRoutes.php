@@ -11,7 +11,7 @@ class FilmRoutes extends Route
     public static function register_routes(App $app)
     {
         $app->get('/programmazione', self::class . ':get_programmazione');
-        $app->get('/programmazione/{titolo_film}', self::class . ':get_film');
+        $app->get('/programmazione/{titolo_film}', self::class . ':get_film_by_titolo');
     }
 
     public function get_programmazione(Request $request, Response $response)
@@ -61,7 +61,7 @@ class FilmRoutes extends Route
         return $response;
     }
 
-    public function get_film(Request $request, Response $response)
+    public function get_film_by_titolo(Request $request, Response $response)
     {
         $result = false;
 
