@@ -6,64 +6,60 @@ class User
     {
         $con = DBController::getConnection();
 
-        if ($con) {
-            $query = "SELECT * FROM utente WHERE username = ?";
+        $query = "SELECT * FROM utente WHERE username = ?";
 
-            $stmt = $con->prepare($query);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $stmt->store_result();
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
 
-            $num_rows = $stmt->num_rows();
+        $num_rows = $stmt->num_rows();
 
-            if ($num_rows > 0) {
-                return $num_rows;
-            } else {
-                return false;
-            }
+        if ($num_rows > 0) {
+            return $num_rows;
+        } else {
+            return false;
         }
     }
 
-    public static function email_esistente($email){
+    public static function email_esistente($email)
+    {
         $con = DBController::getConnection();
 
-        if ($con) {
-            $query = "SELECT * FROM utente WHERE email = ?";
+        $query = "SELECT * FROM utente WHERE email = ?";
 
-            $stmt = $con->prepare($query);
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $stmt->store_result();
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
 
-            $num_rows = $stmt->num_rows();
+        $num_rows = $stmt->num_rows();
 
-            if ($num_rows > 0) {
-                return $num_rows;
-            } else {
-                return false;
-            }
+        if ($num_rows > 0) {
+            return $num_rows;
+        } else {
+            return false;
         }
+
     }
 
     public static function dispositivo_esistente($token)
     {
         $con = DBController::getConnection();
 
-        if ($con) {
-            $query = "SELECT * FROM utente WHERE token_fcm = ?";
+        $query = "SELECT * FROM utente WHERE token_fcm = ?";
 
-            $stmt = $con->prepare($query);
-            $stmt->bind_param("s", $token);
-            $stmt->execute();
-            $stmt->store_result();
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("s", $token);
+        $stmt->execute();
+        $stmt->store_result();
 
-            $num_rows = $stmt->num_rows();
+        $num_rows = $stmt->num_rows();
 
-            if ($num_rows > 0) {
-                return $num_rows;
-            } else {
-                return false;
-            }
+        if ($num_rows > 0) {
+            return $num_rows;
+        } else {
+            return false;
         }
     }
 
@@ -71,22 +67,19 @@ class User
     {
         $con = DBController::getConnection();
 
-        if ($con) {
-            $query = "SELECT token_fcm FROM utente";
+        $query = "SELECT token_fcm FROM utente";
 
-            $stmt = $con->prepare($query);
-            $stmt->execute();
-            $stmt->bind_result($token);
+        $stmt = $con->prepare($query);
+        $stmt->execute();
+        $stmt->bind_result($token);
 
-            $tokens = array();
+        $tokens = array();
 
-            while ($stmt->fetch()) {
-                $tokens[] = $token;
-            }
-
-            return $tokens;
-
+        while ($stmt->fetch()) {
+            $tokens[] = $token;
         }
+
+        return $tokens;
 
     }
 
@@ -94,22 +87,20 @@ class User
     {
         $con = DBController::getConnection();
 
-        if ($con) {
-            $query = "SELECT token_fcm FROM utente WHERE username = ?";
+        $query = "SELECT token_fcm FROM utente WHERE username = ?";
 
-            $stmt = $con->prepare($query);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $stmt->bind_result($token);
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($token);
 
-            $tokens = array();
+        $tokens = array();
 
-            while ($stmt->fetch()) {
-                $tokens[] = $token;
-            }
-
-            return $tokens;
+        while ($stmt->fetch()) {
+            $tokens[] = $token;
         }
+
+        return $tokens;
     }
 
 }

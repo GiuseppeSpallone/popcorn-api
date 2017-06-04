@@ -19,42 +19,52 @@ class UserRoutes extends Route
     {
         $result = false;
 
-        $requestData = $request->getParsedBody();
+        $con = DBController::getConnection();
 
-        $username = $requestData['username'];
-        $email = $requestData['email'];
-        $password = $requestData['password'];
-        $token = $requestData['token'];
+        if ($con) {
+            $requestData = $request->getParsedBody();
 
-        if ($username && $email && $password && $token) {
-            if (User::dispositivo_esistente($token)) {
-                $this->message = "dispositivo già registrato";
-            } else {
-                if (User::username_esistente($username) || User::email_esistente($email)) {
-                    $this->message = "utente esistente";
+            $username = $requestData['username'];
+            $email = $requestData['email'];
+            $password = $requestData['password'];
+            $token = $requestData['token'];
+
+            if ($username && $email && $password && $token) {
+                if (User::dispositivo_esistente($token)) {
+                    $this->message = "dispositivo già registrato";
+                    $response = self::get_response($response, $result, 'registrazione', false);
                 } else {
-                    $con = DBController::getConnection();
+                    if (User::username_esistente($username) || User::email_esistente($email)) {
+                        $this->message = "utente esistente";
+                        $response = self::get_response($response, $result, 'registrazione', false);
+                    } else {
+                        $con = DBController::getConnection();
 
-                    $query = "INSERT INTO utente (username, email, password, token_fcm) VALUES (?, ?, ?, ?)";
+                        $query = "INSERT INTO utente (username, email, password, token_fcm) VALUES (?, ?, ?, ?)";
 
-                    $stmt = $con->prepare($query);
-                    $stmt->bind_param("ssss", $username, $email, md5($password), $token);
-                    $stmt->execute();
-                    $stmt->store_result();
+                        $stmt = $con->prepare($query);
+                        $stmt->bind_param("ssss", $username, $email, md5($password), $token);
+                        $stmt->execute();
+                        $stmt->store_result();
 
-                    if ($stmt) {
-                        $result = true;
-                        $this->message = "registrazione effettuata";
-                        $response = self::get_response($response, $result, 'registrazione', true);
+                        if ($stmt) {
+                            $result = true;
+                            $this->message = "registrazione effettuata";
+                            $response = self::get_response($response, $result, 'registrazione', true);
+                        }
                     }
                 }
+
+            } else {
+                $this->message = "parametri mancanti";
+                $response = self::get_response($response, $result, 'registrazione', false);
             }
+
         } else {
-            $this->messages = "parametri mancanti";
-        }
-        if (!$stmt) {
+            $this->message = "database non connesso";
             $response = self::get_response($response, $result, 'registrazione', false);
         }
+
         return $response;
     }
 

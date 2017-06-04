@@ -21,25 +21,33 @@ class NotificationsRoutes extends Route
     {
         $result = false;
 
-        $requestData = $request->getParsedBody();
+        $con = DBController::getConnection();
 
-        $message = array("message" => $requestData['message']);
+        if ($con) {
+            $requestData = $request->getParsedBody();
 
-        if ($message) {
-            $tokens = User::get_tokens();
-            if ($tokens) {
-                $firebase = new FirebaseController();
-                $notifications = $firebase->send($tokens, $message);
+            $message = $requestData['message'];
 
-                $result = true;
-                $this->message = "messaggi inviati";
-                $response = self::get_response($response, $result, 'notifica', $notifications);
+            if ($message) {
+                $message = array("message" => $message);
+                $tokens = User::get_tokens();
+                if ($tokens) {
+                    $firebase = new FirebaseController();
+                    $notifications = $firebase->send($tokens, $message);
+
+                    $result = true;
+                    $this->message = "messaggi inviati";
+                    $response = self::get_response($response, $result, 'notifica', $notifications);
+                } else {
+                    $this->message = "non ci sono dispositivi registrati";
+                    $response = self::get_response($response, $result, 'notifica', false);
+                }
             } else {
-                $this->message = "non ci sono dispositivi registrati";
+                $this->message = "parametri mancanti";
                 $response = self::get_response($response, $result, 'notifica', false);
             }
         } else {
-            $this->message = "parametri mancanti";
+            $this->message = "database non connesso";
             $response = self::get_response($response, $result, 'notifica', false);
         }
 
@@ -50,32 +58,41 @@ class NotificationsRoutes extends Route
     {
         $result = false;
 
-        $requestData = $request->getParsedBody();
+        $con = DBController::getConnection();
 
-        $username = $requestData['username'];
-        $message = array("message" => $requestData['message']);
+        if ($con) {
+            $requestData = $request->getParsedBody();
 
-        if ($username && $message) {
-            $utente = User::username_esistente($username);
-            if ($utente) {
-                $token = User::get_token_by_username($username);
-                if ($token) {
-                    $firebase = new FirebaseController();
-                    $notification = $firebase->send($token, $message);
+            $username = $requestData['username'];
+            $message = $requestData['message'];
 
-                    $result = true;
-                    $this->message = "messaggio inviato";
-                    $response = self::get_response($response, $result, 'notifica', $notification);
+            if ($username && $message) {
+                $message = array("message" => $message);
+                $utente = User::username_esistente($username);
+                if ($utente) {
+                    $token = User::get_token_by_username($username);
+                    if ($token) {
+                        $firebase = new FirebaseController();
+                        $notification = $firebase->send($token, $message);
+
+                        $result = true;
+                        $this->message = "messaggio inviato";
+                        $response = self::get_response($response, $result, 'notifica', $notification);
+                    } else {
+                        $this->message = "messaggio non inviato";
+                        $response = self::get_response($response, $result, 'notifica', false);
+                    }
                 } else {
-                    $this->message = "messaggio non inviato";
+                    $this->message = "l'utente non è registrato";
                     $response = self::get_response($response, $result, 'notifica', false);
                 }
             } else {
-                $this->message = "l'utente non è registrato";
+                $this->message = "parametri mancanti";
                 $response = self::get_response($response, $result, 'notifica', false);
             }
+
         } else {
-            $this->message = "parametri mancanti";
+            $this->message = "database non connesso";
             $response = self::get_response($response, $result, 'notifica', false);
         }
 
