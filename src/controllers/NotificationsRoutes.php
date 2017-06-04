@@ -26,14 +26,17 @@ class NotificationsRoutes extends Route
         if ($con) {
             $requestData = $request->getParsedBody();
 
+            $title = $requestData['title'];
             $message = $requestData['message'];
 
-            if ($message) {
-                $message = array("message" => $message);
+            if ($message && $title) {
+                $data['data']['title'] = $title;
+                $data['data']['message'] = $message;
+
                 $tokens = User::get_tokens();
                 if ($tokens) {
                     $firebase = new FirebaseController();
-                    $notifications = $firebase->send($tokens, $message);
+                    $notifications = $firebase->send($tokens, $data);
 
                     $result = true;
                     $this->message = "messaggi inviati";
@@ -64,16 +67,19 @@ class NotificationsRoutes extends Route
             $requestData = $request->getParsedBody();
 
             $username = $requestData['username'];
+            $title = $requestData['title'];
             $message = $requestData['message'];
 
-            if ($username && $message) {
-                $message = array("message" => $message);
+            if ($username && $title && $message) {
+                $data['data']['title'] = $title;
+                $data['data']['message'] = $message;
+
                 $utente = User::username_esistente($username);
                 if ($utente) {
                     $token = User::get_token_by_username($username);
                     if ($token) {
                         $firebase = new FirebaseController();
-                        $notification = $firebase->send($token, $message);
+                        $notification = $firebase->send($token, $data);
 
                         $result = true;
                         $this->message = "messaggio inviato";
