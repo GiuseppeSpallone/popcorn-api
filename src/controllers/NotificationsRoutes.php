@@ -29,11 +29,11 @@ class NotificationsRoutes extends Route
             $tokens = User::get_tokens();
             if ($tokens) {
                 $firebase = new FirebaseController();
-                $result = $firebase->send($tokens, $message);
+                $notifications = $firebase->send($tokens, $message);
 
                 $result = true;
-                $this->message = "messaggio inviato";
-                $response = self::get_response($response, $result, 'notifica', true);
+                $this->message = "messaggi inviati";
+                $response = self::get_response($response, $result, 'notifica', $notifications);
             } else {
                 $this->message = "non ci sono dispositivi registrati";
                 $response = self::get_response($response, $result, 'notifica', false);
@@ -61,10 +61,11 @@ class NotificationsRoutes extends Route
                 $token = User::get_token_by_username($username);
                 if ($token) {
                     $firebase = new FirebaseController();
-                    $result = $firebase->send($token, $message);
+                    $notification = $firebase->send($token, $message);
 
+                    $result = true;
                     $this->message = "messaggio inviato";
-                    $response = self::get_response($response, $result, 'notifica', true);
+                    $response = self::get_response($response, $result, 'notifica', $notification);
                 } else {
                     $this->message = "messaggio non inviato";
                     $response = self::get_response($response, $result, 'notifica', false);
