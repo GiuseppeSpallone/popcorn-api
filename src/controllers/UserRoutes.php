@@ -15,6 +15,7 @@ class UserRoutes extends Route
         $app->post('/utente/registrazione', self::class . ':registrazione_utente');
         $app->post('/utente/accesso', self::class . ':accesso_utente');
         $app->get('/utente/{username}', self::class . ':get_utente_by_username');
+        $app->delete('/utente/{username}/delete', self::class . ':delete_utente_by_username');
 
     }
 
@@ -134,6 +135,46 @@ class UserRoutes extends Route
         } else {
             $this->message = "database non connesso";
             $response = self::get_response($response, $result, 'utente', false);
+        }
+
+        return $response;
+    }
+
+    public function delete_utente_by_username(Request $request, Response $response)
+    {
+        $result = false;
+
+        $con = DBController::getConnection();
+
+        if ($con) {
+
+            $username = $request->getAttribute('username');
+
+            $utente = User::get_utente_by_username($username);
+
+            if ($utente) {
+                $query = "DELETE FROM utente WHERE username = ?";
+
+                $stmt = $con->prepare($query);
+                $stmt->bind_param("s", $username);
+                $stmt->execute();
+                $stmt->store_result();
+
+                if ($stmt) {
+                    $result = true;
+                    $this->message = "utente cancellato";
+                    $response = self::get_response($response, $result, 'delete', true);
+                } else {
+                    $this->message = "utente non cancellato";
+                    $response = self::get_response($response, $result, 'delete', true);
+                }
+            } else {
+                $this->message = "utente non esistente";
+                $response = self::get_response($response, $result, 'delete', false);
+            }
+        } else {
+            $this->message = "database non connesso";
+            $response = self::get_response($response, $result, 'delete', false);
         }
 
         return $response;
