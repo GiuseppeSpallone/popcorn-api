@@ -16,7 +16,7 @@ class UserRoutes extends Route
         $app->post('/utente/accesso', self::class . ':accesso_utente');
         $app->get('/utente/{username}', self::class . ':get_utente_by_username');
         $app->delete('/utente/{username}/delete', self::class . ':delete_utente_by_username');
-        $app->put('/utente/{username}/edit_notifica', self::class . ':edit_notifica');
+        $app->put('/utente/{username}/edit', self::class . ':edit_utente_by_username');
     }
 
     public function registrazione_utente(Request $request, Response $response)
@@ -180,7 +180,7 @@ class UserRoutes extends Route
         return $response;
     }
 
-    public function edit_notifica(Request $request, Response $response)
+    public function edit_utente_by_username(Request $request, Response $response)
     {
         $result = false;
 
@@ -193,27 +193,60 @@ class UserRoutes extends Route
             $utente = User::get_utente_by_username($username);
 
             if ($utente) {
-                $notifica = $request->getHeader('notifica');
+                $query = "UPDATE utente SET";
 
-                if ($notifica[0] == 'T' || $notifica[0] == 'F') {
-                    $query = "UPDATE utente SET notifica = ? WHERE username = ?";
+                $newUsername = $request->getHeader('username');
+                $newEmail = $request->getHeader('email');
+                $newPassword = $request->getHeader('password');
+                $newNotifica = $request->getHeader('notifica');
 
-                    $stmt = $con->prepare($query);
-                    $stmt->bind_param("ss", $notifica[0], $username);
-                    $stmt->execute();
-                    $stmt->store_result();
-
-                    if ($stmt) {
-                        $result = true;
-                        $this->message = "permesso notifica modificato";
-                        $response = self::get_response($response, $result, 'edit', true);
+                if ($newUsername) {
+                    if (User::get_utente_by_username($newUsername[0])) {
+                        $this->message = "username già esistente";
+                        $response = self::get_response($response, $result, 'edit', false);
+                        return $response;
                     } else {
-                        $this->message = "permesso notifica non modificato";
-                        $response = self::get_response($response, $result, 'edit', true);
+                        $query .= " username = '" . $newUsername[0] . "',";
                     }
-                } else {
-                    $this->message = "inserisci T se vuoi abilitare le notifiche, oppure inserisci F se vuoi disasttivare le notifiche";
+                }
+                if ($newEmail) {
+                    if (User::get_utente_by_email($newEmail[0])) {
+                        $this->message = "email già esistente";
+                        $response = self::get_response($response, $result, 'edit', false);
+                        return $response;
+                    } else {
+                        $query .= " email = '" . $newEmail[0] . "',";
+                    }
+                }
+                if ($newPassword) {
+                    $query .= " password = '" . md5($newPassword[0]) . "',";
+                }
+                if ($newNotifica) {
+                    if ($newNotifica[0] == 'T' || $newNotifica[0] == 'F') {
+                        $query .= " notifica = '" . $newNotifica[0] . "',";
+                    } else {
+                        $this->message = "inserisci T se vuoi abilitare le notifiche, oppure inserisci F se vuoi disasttivare le notifiche";
+                        $response = self::get_response($response, $result, 'edit', false);
+                        return $response;
+                    }
+                }
+                $query = rtrim($query, ',');
+                $query .= " WHERE username = '" . $username . "'";
+
+                print_r($query);
+                die();
+
+                $stmt = $con->prepare($query);
+                $stmt->execute();
+                $stmt->store_result();
+
+                if ($stmt) {
+                    $result = true;
+                    $this->message = "utente modificato";
                     $response = self::get_response($response, $result, 'edit', true);
+                } else {
+                    $this->message = "utente non modificato";
+                    $response = self::get_response($response, $result, 'edit', false);
                 }
             } else {
                 $this->message = "utente non esistente";
