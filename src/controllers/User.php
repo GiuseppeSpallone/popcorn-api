@@ -135,16 +135,18 @@ class User
     {
         $con = DBController::getConnection();
 
-        $query = "SELECT token_fcm FROM utente";
+        $query = "SELECT token_fcm, notifica FROM utente";
 
         $stmt = $con->prepare($query);
         $stmt->execute();
-        $stmt->bind_result($token);
+        $stmt->bind_result($token, $notifica);
 
         $tokens = array();
 
         while ($stmt->fetch()) {
-            $tokens[] = $token;
+            if($notifica == 'T'){
+                $tokens[] = $token;
+            }
         }
 
         return $tokens;

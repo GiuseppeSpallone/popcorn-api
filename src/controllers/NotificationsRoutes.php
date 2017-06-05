@@ -34,6 +34,8 @@ class NotificationsRoutes extends Route
                 $data['data']['message'] = $message;
 
                 $tokens = User::get_tokens();
+                print_r($tokens);
+                die();
                 if ($tokens) {
                     $firebase = new FirebaseController();
                     $notifications = $firebase->send($tokens, $data);
