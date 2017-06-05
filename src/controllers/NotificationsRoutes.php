@@ -76,16 +76,23 @@ class NotificationsRoutes extends Route
 
                 $utente = User::get_utente_by_username($username);
                 if ($utente) {
-                    $token = User::get_token_by_username($username);
-                    if ($token) {
-                        $firebase = new FirebaseController();
-                        $notification = $firebase->send($token, $data);
+                    $permesso = $utente[0]['notifica'];
 
-                        $result = true;
-                        $this->message = "messaggio inviato";
-                        $response = self::get_response($response, $result, 'notifica', $notification);
-                    } else {
-                        $this->message = "messaggio non inviato";
+                    if($permesso == 'T'){
+                        $token[] = $utente[0]['token_fcm'];
+                        if ($token) {
+                            $firebase = new FirebaseController();
+                            $notification = $firebase->send($token, $data);
+
+                            $result = true;
+                            $this->message = "messaggio inviato";
+                            $response = self::get_response($response, $result, 'notifica', $notification);
+                        } else {
+                            $this->message = "messaggio non inviato";
+                            $response = self::get_response($response, $result, 'notifica', false);
+                        }
+                    }else{
+                        $this->message = "l'utente ha disattivato le notifiche";
                         $response = self::get_response($response, $result, 'notifica', false);
                     }
                 } else {

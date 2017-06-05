@@ -16,7 +16,6 @@ class UserRoutes extends Route
         $app->post('/utente/accesso', self::class . ':accesso_utente');
         $app->get('/utente/{username}', self::class . ':get_utente_by_username');
         $app->delete('/utente/{username}/delete', self::class . ':delete_utente_by_username');
-
     }
 
     public function registrazione_utente(Request $request, Response $response)
