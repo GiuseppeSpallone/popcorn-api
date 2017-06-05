@@ -16,6 +16,7 @@ class UserRoutes extends Route
         $app->post('/utente/accesso', self::class . ':accesso_utente');
         $app->get('/utente/{username}', self::class . ':get_utente_by_username');
         $app->delete('/utente/{username}/delete', self::class . ':delete_utente_by_username');
+        $app->put('/utente/{username}/edit_notifica', self::class . ':edit_notifica');
     }
 
     public function registrazione_utente(Request $request, Response $response)
@@ -174,6 +175,53 @@ class UserRoutes extends Route
         } else {
             $this->message = "database non connesso";
             $response = self::get_response($response, $result, 'delete', false);
+        }
+
+        return $response;
+    }
+
+    public function edit_notifica(Request $request, Response $response)
+    {
+        $result = false;
+
+        $con = DBController::getConnection();
+
+        if ($con) {
+
+            $username = $request->getAttribute('username');
+
+            $utente = User::get_utente_by_username($username);
+
+            if ($utente) {
+                $notifica = $request->getHeader('notifica');
+
+                if ($notifica[0] == 'T' || $notifica[0] == 'F') {
+                    $query = "UPDATE utente SET notifica = ? WHERE username = ?";
+
+                    $stmt = $con->prepare($query);
+                    $stmt->bind_param("ss", $notifica[0], $username);
+                    $stmt->execute();
+                    $stmt->store_result();
+
+                    if ($stmt) {
+                        $result = true;
+                        $this->message = "permesso notifica modificato";
+                        $response = self::get_response($response, $result, 'edit', true);
+                    } else {
+                        $this->message = "permesso notifica non modificato";
+                        $response = self::get_response($response, $result, 'edit', true);
+                    }
+                } else {
+                    $this->message = "inserisci T se vuoi abilitare le notifiche, oppure inserisci F se vuoi disasttivare le notifiche";
+                    $response = self::get_response($response, $result, 'edit', true);
+                }
+            } else {
+                $this->message = "utente non esistente";
+                $response = self::get_response($response, $result, 'edit', false);
+            }
+        } else {
+            $this->message = "database non connesso";
+            $response = self::get_response($response, $result, 'edit', false);
         }
 
         return $response;
