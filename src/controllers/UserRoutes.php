@@ -102,11 +102,11 @@ class UserRoutes extends Route
                 }
             } else {
                 $this->message = "parametri mancanti";
-                $response = self::get_response($response, $result, 'registrazione', false);
+                $response = self::get_response($response, $result, 'accesso', false);
             }
         } else {
             $this->message = "database non connesso";
-            $response = self::get_response($response, $result, 'registrazione', false);
+            $response = self::get_response($response, $result, 'accesso', false);
         }
 
         return $response;
