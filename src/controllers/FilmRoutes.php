@@ -21,7 +21,7 @@ class FilmRoutes extends Route
         $con = DBController::getConnection();
 
         if ($con) {
-            $query = "SELECT film.titolo, orario.orario1, orario.orario2, orario.orario3, sala.numero 
+            $query = "SELECT film.titolo, orario.orario1, orario.orario2, orario.orario3, sala.numero, film.id_poster
                                         FROM ((film INNER JOIN proiezione ON film.id = proiezione.id_film) 
                                         INNER JOIN sala ON sala.id = proiezione.id_sala) 
                                         INNER JOIN orario ON orario.id = proiezione.id_orario 
@@ -32,7 +32,7 @@ class FilmRoutes extends Route
             $stmt->store_result();
 
             if ($stmt->num_rows()) {
-                $stmt->bind_result($titolo, $orario1, $orario2, $orario3, $sala);
+                $stmt->bind_result($titolo, $orario1, $orario2, $orario3, $sala, $poster);
 
                 $films = array();
 
@@ -43,6 +43,7 @@ class FilmRoutes extends Route
                     $temp['orario2'] = $orario2;
                     $temp['orario3'] = $orario3;
                     $temp['sala'] = $sala;
+                    $temp['id_poster'] = $poster;
                     array_push($films, $temp);
                 }
 

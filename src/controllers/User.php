@@ -106,7 +106,7 @@ class User
         $query = "SELECT id, username, email, token_fcm, notifica FROM utente WHERE token_fcm = ?";
 
         $stmt = $con->prepare($query);
-        $stmt->bind_param("s", $token);
+        $stmt->bind_param('s', $token);
         $stmt->execute();
         $stmt->store_result();
 
